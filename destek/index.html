@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandalina OS - Destek Merkezi</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --accent-color: #ff6f00;
+            --text-color: #c9d1d9;
+            --border-color: #30363d;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%; max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+        h1 { color: var(--accent-color); text-align: center; font-size: 24px; margin-bottom: 8px; }
+        p.subtitle { text-align: center; font-size: 14px; color: #8b949e; margin-bottom: 24px; }
+        .user-welcome {
+            display: none; background: #11161d; padding: 12px;
+            border-radius: 8px; border: 1px solid var(--border-color);
+            margin-bottom: 15px; align-items: center; justify-content: space-between;
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-color); }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .menu-btn {
+            background-color: #21262d; border: 1px solid var(--border-color);
+            color: var(--text-color); padding: 16px; border-radius: 8px;
+            font-size: 16px; font-weight: 600; cursor: pointer; text-align: left;
+            transition: 0.2s; display: flex; justify-content: space-between; align-items: center;
+        }
+        .menu-btn:hover { background-color: #30363d; border-color: var(--accent-color); color: #fff; }
+        .login-box {
+            display: none; margin-top: 15px; background: #11161d;
+            padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);
+        }
+        .login-box input {
+            width: 100%; padding: 10px; margin-bottom: 10px;
+            background: #0d1117; border: 1px solid var(--border-color);
+            color: #fff; border-radius: 6px; box-sizing: border-box;
+        }
+        .login-box button {
+            width: 100%; padding: 10px; background: var(--accent-color);
+            border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer;
+        }
+        .status-box {
+            margin-top: 20px; background: #090d16; border: 1px solid var(--border-color);
+            padding: 12px; border-radius: 8px; font-size: 13px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .badge { background: #238636; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Mandalina OS Santral</h1>
+        <p class="subtitle">GLITCH Destek ve İletişim Hattı</p>
+
+        <div class="user-welcome" id="userWelcome">
+            <div class="user-info">
+                <img id="displayAvatar" src="" alt="Profil" class="user-avatar">
+                <div>
+                    <span style="font-size: 11px; color: #8b949e; display: block;">Giriş Yapıldı</span>
+                    <strong id="displayName" style="color:var(--accent-color);"></strong>
+                </div>
+            </div>
+            <button onclick="oturumuKapat()" style="background:none; border:none; color:#8b949e; cursor:pointer; font-size:12px;">Çıkış Yap</button>
+        </div>
+
+        <div class="menu-grid" id="menuGrid">
+            <button class="menu-btn" onclick="secimYap('Teknik Destek & Kurulum')">
+                <span>🛠️ Mandalina OS Kurulum & Hata</span> ➔
+            </button>
+            <button class="menu-btn" onclick="secimYap('Mandalina OS GLITCH Sürümü')">
+                <span>🍊 GLITCH Yapılandırma & Özellikler</span> ➔
+            </button>
+            <button class="menu-btn" onclick="secimYap('Donanım Uyumluluğu')">
+                <span>💻 Donanım & Sürücü Uyumluluğu</span> ➔
+            </button>
+            <button class="menu-btn" onclick="secimYap('Genel Sohbet')">
+                <span>💬 Diğer / Genel Konular</span> ➔
+            </button>
+        </div>
+
+        <div class="login-box" id="loginBox">
+            <h4 style="margin-top:0; color:var(--accent-color);">Profil Oluştur</h4>
+            <input type="text" id="usernameInput" placeholder="Adınız veya Kullanıcı Adınız">
+            <input type="file" id="avatarFileInput" accept="image/*">
+            <button onclick="kayitOl()">Profili Kaydet ve Devam Et</button>
+        </div>
+
+        <div class="status-box">
+            <span>Muhammed: <strong id="muhammedStatus" style="color: #da3633;">Çevrimdışı</strong></span>
+            <span class="badge" id="siraBadge">Bekleyen: 0 Kişi</span>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = { databaseURL: "https://mandalina-os-web-default-rtdb.firebaseio.com/" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        window.onload = function() {
+            const kayitliKullanici = localStorage.getItem('mandalinos_user');
+            const kayitliAvatar = localStorage.getItem('mandalinos_avatar');
+            
+            if (kayitliKullanici) {
+                document.getElementById('displayName').innerText = kayitliKullanici;
+                document.getElementById('displayAvatar').src = kayitliAvatar || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + kayitliKullanici;
+                document.getElementById('userWelcome').style.display = 'flex';
+            } else {
+                document.getElementById('loginBox').style.display = 'block';
+            }
+
+            db.ref('status/muhammed').on('value', (snapshot) => {
+                const status = snapshot.val();
+                const statusElem = document.getElementById('muhammedStatus');
+                if (status === 'online') {
+                    statusElem.innerText = "Aktif (Çevrimiçi)";
+                    statusElem.style.color = "#238636";
+                } else {
+                    statusElem.innerText = "Çevrimdışı";
+                    statusElem.style.color = "#da3633";
+                }
+            });
+
+            db.ref('calls').on('value', (snapshot) => {
+                document.getElementById('siraBadge').innerText = `Bekleyen: ${snapshot.numChildren()} Kişi`;
+            });
+        };
+
+        function kayitOl() {
+            const isim = document.getElementById('usernameInput').value.trim();
+            const fileInput = document.getElementById('avatarFileInput');
+
+            if (!isim) { alert("Lütfen adını yaz kanka!"); return; }
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('mandalinos_user', isim);
+                    localStorage.setItem('mandalinos_avatar', e.target.result);
+                    location.reload();
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                localStorage.setItem('mandalinos_user', isim);
+                localStorage.setItem('mandalinos_avatar', 'https://api.dicebear.com/7.x/identicon/svg?seed=' + isim);
+                location.reload();
+            }
+        }
+
+        function oturumuKapat() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        function secimYap(kategori) {
+            const kayitliKullanici = localStorage.getItem('mandalinos_user');
+            const kayitliAvatar = localStorage.getItem('mandalinos_avatar');
+
+            if (!kayitliKullanici) {
+                alert("Lütfen önce profil oluştur!");
+                document.getElementById('loginBox').style.display = 'block';
+                return;
+            }
+
+            const callRef = db.ref('calls').push();
+            callRef.set({
+                user: kayitliKullanici,
+                avatar: kayitliAvatar,
+                category: kategori,
+                timestamp: Date.now()
+            }).then(() => {
+                alert(`${kayitliKullanici}, "${kategori}" talebin Maestro'ya (Muhammed) iletildi!`);
+            });
+        }
+    </script>
+
+</body>
+</html>
