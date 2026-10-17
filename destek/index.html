@@ -26,20 +26,23 @@
         h1 { color: var(--accent-color); margin-bottom: 5px; font-size: 22px; }
         .queue-card {
             background: #0d1117; border: 1px solid var(--accent-cyan); border-radius: 10px;
-            padding: 12px; margin: 15px 0; display: none;
+            padding: 15px; margin: 15px 0; display: none;
+        }
+        .chat-container {
+            display: none; margin-top: 15px; text-align: left;
         }
         .chat-box {
             background: #0d1117; border: 1px solid var(--border-color); border-radius: 8px;
-            height: 220px; overflow-y: auto; padding: 10px; text-align: left; margin-bottom: 10px;
+            height: 240px; overflow-y: auto; padding: 10px; margin-bottom: 10px;
         }
         .msg { margin-bottom: 8px; font-size: 13px; word-break: break-all; }
         .msg-user { color: var(--accent-cyan); }
         .msg-admin { color: var(--accent-orange); }
         .msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; border: 1px solid var(--border-color); }
-        .input-row { display: flex; gap: 6px; }
+        .input-row { display: flex; gap: 6px; margin-bottom: 8px; }
         .input-row input[type="text"] { flex: 1; padding: 8px; background: #0d1117; border: 1px solid var(--border-color); color: #fff; border-radius: 6px; }
         .btn { padding: 8px 14px; background: var(--accent-color); border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .btn-cyan { background: var(--accent-cyan); color: #000; }
+        .btn-cyan { background: var(--accent-cyan); color: #000; border: none; font-weight: bold; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -48,26 +51,34 @@
 
     <div class="container">
         <h1>Mandalina OS GLITCH Destek</h1>
-        <p style="color:#8b949e; font-size: 13px;">Canlı Mesajlaşma, Ekran Görüntüsü & Uzaktan Kontrol</p>
+        <p style="color:#8b949e; font-size: 13px;">Canlı İletişim & Uzaktan Kontrol Merkezi</p>
 
         <div id="userInfoDisplay" style="color: var(--accent-cyan); font-weight: bold; margin-bottom: 10px;"></div>
 
-        <button class="btn" style="width:100%; padding:12px; margin-bottom:10px;" onclick="destekTalebiOlustur()">📞 Maestro (Muhammed) ile Destek Başlat</button>
+        <button id="requestBtn" class="btn" style="width:100%; padding:12px; margin-bottom:10px;" onclick="destekTalebiOlustur()">📞 Maestro (Muhammed) ile Görüşme Sırası Al</button>
 
+        <!-- BEKLEME EKRANI -->
         <div class="queue-card" id="queueCard">
-            <p id="queuePositionText" style="font-size: 15px; font-weight: bold; color: #fff; margin:0;">Sırada Bekleniyor...</p>
-            <p id="adminActivityText" style="font-size: 12px; color: #8b949e; margin: 4px 0 0 0;">Muhammed: Boşta</p>
+            <p id="queuePositionText" style="font-size: 16px; font-weight: bold; color: #fff; margin:0;">Sıra Bekleniyor...</p>
+            <p id="adminActivityText" style="font-size: 12px; color: #8b949e; margin: 6px 0 0 0;">Muhammed Şu An: Boşta</p>
         </div>
 
-        <div class="chat-box" id="chatBox"></div>
+        <!-- TALEBİ KABUL EDİLDİĞİNDE AÇILACAK CHAT VE UZAKTAN KONTROL PANENİ -->
+        <div class="chat-container" id="chatContainer">
+            <div style="background: rgba(0,240,255,0.1); border: 1px solid var(--accent-cyan); padding: 8px; border-radius: 6px; color: var(--accent-cyan); font-size: 12px; margin-bottom: 10px; text-align: center;">
+                🟢 Maestro talebinizi kabul etti! Canlı görüşme başladı.
+            </div>
+            
+            <div class="chat-box" id="chatBox"></div>
 
-        <div class="input-row">
-            <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
-            <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="resimGonder(this)">
-            <button class="btn-cyan" onclick="document.getElementById('fileInput').click()">📷 Görsel</button>
-            <button class="btn" onclick="mesajGonder()">Gönder</button>
+            <div class="input-row">
+                <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
+                <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="resimGonder(this)">
+                <button class="btn-cyan" onclick="document.getElementById('fileInput').click()">📷 Görsel</button>
+                <button class="btn" onclick="mesajGonder()">Gönder</button>
+            </div>
+            <button class="btn-cyan" style="width:100%; padding: 10px;" onclick="uzaktanKontrolIstegi()">🖥️ Mandalina OS Uzaktan Kontrol İste</button>
         </div>
-        <button class="btn-cyan" style="width:100%; margin-top:8px;" onclick="uzaktanKontrolIstegi()">🖥️ Mandalina OS Uzaktan Kontrol İste</button>
     </div>
 
     <script>
@@ -84,10 +95,23 @@
             }
             document.getElementById('userInfoDisplay').innerText = `Kullanıcı: ${username}`;
 
+            // Canlı Aktivite Dinle
             db.ref('status/activity').on('value', (snapshot) => {
                 document.getElementById('adminActivityText').innerText = `Muhammed Şu An: ${snapshot.val() || 'Boşta'}`;
             });
 
+            // Kullanıcının Talebi Kabul Edildi mi (Active Call) Dinle
+            db.ref(`active_sessions/${username}`).on('value', (snapshot) => {
+                if (snapshot.exists() && snapshot.val().status === 'accepted') {
+                    document.getElementById('queueCard').style.display = 'none';
+                    document.getElementById('requestBtn').style.display = 'none';
+                    document.getElementById('chatContainer').style.display = 'block';
+                } else {
+                    document.getElementById('chatContainer').style.display = 'none';
+                }
+            });
+
+            // Bekleme Sırasını Dinle
             db.ref('calls').on('value', (snapshot) => {
                 let position = 0, count = 0;
                 snapshot.forEach((child) => {
@@ -95,14 +119,15 @@
                     if (child.val().user === username) position = count;
                 });
 
-                if (position > 0) {
+                if (position > 0 && document.getElementById('chatContainer').style.display === 'none') {
                     document.getElementById('queueCard').style.display = 'block';
                     document.getElementById('queuePositionText').innerText = `Sıranız: ${position}. (Önünüzde ${position - 1} kişi var)`;
-                } else {
+                } else if (position === 0 && document.getElementById('chatContainer').style.display === 'none') {
                     document.getElementById('queueCard').style.display = 'none';
                 }
             });
 
+            // Mesajları Dinle
             db.ref(`chats/${username}`).on('child_added', (snapshot) => {
                 const data = snapshot.val();
                 const chatBox = document.getElementById('chatBox');
