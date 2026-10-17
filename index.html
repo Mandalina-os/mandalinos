@@ -55,8 +55,17 @@
         }
 
         .logo { font-size: 20px; font-weight: bold; color: var(--accent-orange); text-shadow: 0 0 10px rgba(255, 111, 0, 0.4); }
-        .nav-links a, .nav-links span { color: var(--text-sub); text-decoration: none; margin-left: 20px; font-size: 14px; transition: color 0.3s; cursor: pointer; }
+        .nav-links a, .nav-links span { color: var(--text-sub); text-decoration: none; margin-left: 15px; font-size: 14px; transition: color 0.3s; cursor: pointer; }
         .nav-links a:hover, .nav-links span:hover { color: var(--accent-cyan); }
+
+        .nav-user-badge {
+            display: flex; align-items: center; gap: 8px; background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--accent-cyan); padding: 4px 12px; border-radius: 20px; cursor: pointer;
+        }
+
+        .nav-user-avatar {
+            width: 24px; height: 24px; border-radius: 50%; object-fit: cover;
+        }
 
         .auth-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -66,18 +75,22 @@
 
         .auth-card {
             background: var(--card-bg); border: 1px solid var(--accent-cyan);
-            border-radius: 16px; padding: 30px; width: 340px; text-align: center;
+            border-radius: 16px; padding: 25px; width: 340px; text-align: center;
             box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
         }
 
-        .auth-card input {
-            width: 100%; padding: 12px; margin-bottom: 12px; background: rgba(0,0,0,0.5);
+        .auth-card input[type="text"], .auth-card input[type="password"] {
+            width: 100%; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.5);
             border: 1px solid var(--card-border); color: #fff; border-radius: 8px; box-sizing: border-box;
         }
 
         .auth-card button {
-            width: 100%; padding: 12px; background: linear-gradient(135deg, #ff6f00, #ff8f00);
-            border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 8px;
+            width: 100%; padding: 10px; background: linear-gradient(135deg, #ff6f00, #ff8f00);
+            border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 6px;
+        }
+
+        .btn-danger {
+            background: #da3633 !important;
         }
 
         .hero { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 120px 20px 60px 20px; }
@@ -110,32 +123,40 @@
         <div class="glow-orb orb-3"></div>
     </div>
 
-    <!-- ZORUNLU KULLANICI GİRİŞİ / KAYIT PENCERESİ -->
+    <!-- GİRİŞ / KAYIT PENCERESİ -->
     <div class="auth-overlay" id="authModal">
         <div class="auth-card">
             <h2 style="color: var(--accent-orange); margin-top: 0;">Mandalina OS Hub</h2>
-            <p style="color: var(--text-sub); font-size: 13px;">Giriş Yapın veya Hesap Oluşturun</p>
+            <p style="color: var(--text-sub); font-size: 13px;">Giriş Yapın veya Kaydolun</p>
             <input type="text" id="authUsername" placeholder="Kullanıcı Adı">
             <input type="password" id="authPassword" placeholder="Şifre">
-            <button onclick="kayitVeyaGirisYap()">Hesaba Giriş Yap / Kaydol</button>
+            <label style="font-size: 12px; color: var(--text-sub); display: block; text-align: left; margin-bottom: 4px;">Profil Resmi (İsteğe Bağlı):</label>
+            <input type="file" id="authAvatar" accept="image/*" style="margin-bottom: 10px; font-size: 12px; color: var(--text-sub);">
+            <button onclick="kayitVeyaGirisYap()">Giriş Yap / Kaydol</button>
         </div>
     </div>
 
-    <!-- HESAP DÜZENLEME PENCERESİ -->
+    <!-- HESAP DÜZENLEME & SİLME MODALI -->
     <div class="auth-overlay" id="editProfileModal" style="display:none;">
         <div class="auth-card">
-            <h2 style="color: var(--accent-cyan); margin-top: 0;">Hesap Düzenle</h2>
+            <h2 style="color: var(--accent-cyan); margin-top: 0;">Hesap Düzenle / Sil</h2>
             <input type="text" id="newUsername" placeholder="Yeni Kullanıcı Adı">
             <input type="password" id="newPassword" placeholder="Yeni Şifre">
-            <button onclick="hesapGuncelle()">Değişiklikleri Kaydet</button>
-            <button onclick="document.getElementById('editProfileModal').style.display='none'" style="background:#da3633;">İptal</button>
+            <label style="font-size: 12px; color: var(--text-sub); display: block; text-align: left; margin-bottom: 4px;">Profil Resmi Değiştir:</label>
+            <input type="file" id="newAvatar" accept="image/*" style="margin-bottom: 10px; font-size: 12px; color: var(--text-sub);">
+            <button onclick="hesapGuncelle()">Güncelle ve Kaydet</button>
+            <button class="btn-danger" onclick="hesapSil()">🗑️ Hesabı Sil</button>
+            <button onclick="document.getElementById('editProfileModal').style.display='none'" style="background:#555;">Kapat</button>
         </div>
     </div>
 
     <nav>
         <div class="logo">🍊 Mandalina OS</div>
-        <div class="nav-links">
-            <span id="userStatusNav" style="color: var(--accent-cyan); font-weight: bold;" onclick="document.getElementById('editProfileModal').style.display='flex'"></span>
+        <div class="nav-links" style="display: flex; align-items: center;">
+            <div id="navUserBadge" class="nav-user-badge" onclick="document.getElementById('editProfileModal').style.display='flex'">
+                <img id="navAvatarImg" src="https://api.dicebear.com/7.x/identicon/svg?seed=user" class="nav-user-avatar">
+                <span id="userStatusNav" style="color: var(--accent-cyan); font-weight: bold; margin: 0;"></span>
+            </div>
             <a href="#hakkinda">Hakkında</a>
             <a href="#surumler">Sürümler</a>
             <a href="destek/">Canlı Destek Hattı</a>
@@ -195,7 +216,15 @@
             const user = localStorage.getItem('mandalinos_user');
             if (user) {
                 document.getElementById('authModal').style.display = 'none';
-                document.getElementById('userStatusNav').innerText = `⚙️ ${user} (Düzenle)`;
+                document.getElementById('userStatusNav').innerText = user;
+                
+                db.ref(`users/${user}`).once('value', (snapshot) => {
+                    if (snapshot.exists() && snapshot.val().avatar) {
+                        document.getElementById('navAvatarImg').src = snapshot.val().avatar;
+                    } else {
+                        document.getElementById('navAvatarImg').src = 'https://api.dicebear.com/7.x/identicon/svg?seed=' + user;
+                    }
+                });
             } else {
                 document.getElementById('authModal').style.display = 'flex';
             }
@@ -204,51 +233,85 @@
         function kayitVeyaGirisYap() {
             const username = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value.trim();
+            const avatarFile = document.getElementById('authAvatar').files[0];
 
             if (!username || !password) {
-                alert("Lütfen alanları doldurun kanka!");
+                alert("Lütfen kullanıcı adı ve şifrenizi girin kanka!");
                 return;
             }
 
             const encryptedPassword = CryptoJS.AES.encrypt(password, 'mandalina_secret_key_2026').toString();
 
-            db.ref(`users/${username}`).set({
-                user: username,
-                pass: encryptedPassword,
-                updatedAt: Date.now()
-            }).then(() => {
-                localStorage.setItem('mandalinos_user', username);
-                document.getElementById('authModal').style.display = 'none';
-                document.getElementById('userStatusNav').innerText = `⚙️ ${username} (Düzenle)`;
-            });
+            const saveUserData = (avatarData) => {
+                db.ref(`users/${username}`).set({
+                    user: username,
+                    pass: encryptedPassword,
+                    avatar: avatarData || ('https://api.dicebear.com/7.x/identicon/svg?seed=' + username),
+                    updatedAt: Date.now()
+                }).then(() => {
+                    localStorage.setItem('mandalinos_user', username);
+                    location.reload();
+                });
+            };
+
+            if (avatarFile) {
+                const reader = new FileReader();
+                reader.onload = (e) => saveUserData(e.target.result);
+                reader.readAsDataURL(avatarFile);
+            } else {
+                saveUserData(null);
+            }
         }
 
         function hesapGuncelle() {
             const oldUser = localStorage.getItem('mandalinos_user');
-            const newUser = document.getElementById('newUsername').value.trim();
+            const newUser = document.getElementById('newUsername').value.trim() || oldUser;
             const newPass = document.getElementById('newPassword').value.trim();
+            const avatarFile = document.getElementById('newAvatar').files[0];
 
-            if (!newUser || !newPass) {
-                alert("Lütfen yeni bilgileri yazın kanka!");
-                return;
+            const updateUser = (avatarData) => {
+                const encryptedPassword = newPass ? CryptoJS.AES.encrypt(newPass, 'mandalina_secret_key_2026').toString() : null;
+                
+                db.ref(`users/${oldUser}`).once('value', (snapshot) => {
+                    const currentData = snapshot.val() || {};
+                    const finalPass = encryptedPassword || currentData.pass;
+                    const finalAvatar = avatarData || currentData.avatar;
+
+                    if (oldUser !== newUser) {
+                        db.ref(`users/${oldUser}`).remove();
+                    }
+
+                    db.ref(`users/${newUser}`).set({
+                        user: newUser,
+                        pass: finalPass,
+                        avatar: finalAvatar,
+                        updatedAt: Date.now()
+                    }).then(() => {
+                        localStorage.setItem('mandalinos_user', newUser);
+                        alert("Hesap bilgilerin başarıyla güncellendi!");
+                        location.reload();
+                    });
+                });
+            };
+
+            if (avatarFile) {
+                const reader = new FileReader();
+                reader.onload = (e) => updateUser(e.target.result);
+                reader.readAsDataURL(avatarFile);
+            } else {
+                updateUser(null);
             }
+        }
 
-            const encryptedPassword = CryptoJS.AES.encrypt(newPass, 'mandalina_secret_key_2026').toString();
-
-            if (oldUser !== newUser) {
-                db.ref(`users/${oldUser}`).remove();
+        function hesapSil() {
+            const user = localStorage.getItem('mandalinos_user');
+            if (confirm(`${user} hesabını ve verilerini tamamen silmek istediğine emin misin?`)) {
+                db.ref(`users/${user}`).remove().then(() => {
+                    localStorage.removeItem('mandalinos_user');
+                    alert("Hesabın başarıyla silindi kanka.");
+                    location.reload();
+                });
             }
-
-            db.ref(`users/${newUser}`).set({
-                user: newUser,
-                pass: encryptedPassword,
-                updatedAt: Date.now()
-            }).then(() => {
-                localStorage.setItem('mandalinos_user', newUser);
-                document.getElementById('editProfileModal').style.display = 'none';
-                document.getElementById('userStatusNav').innerText = `⚙️ ${newUser} (Düzenle)`;
-                alert("Hesap bilgilerin başarıyla güncellendi!");
-            });
         }
 
         function cikisYap() {
