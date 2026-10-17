@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandalina OS - Destek Hattı</title>
+    <title>Mandalina OS - Live Support & Remote Hub</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -19,19 +19,27 @@
             margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            width: 100%; max-width: 480px; background: var(--card-bg);
-            border: 1px solid var(--border-color); border-radius: 12px; padding: 24px;
+            width: 100%; max-width: 520px; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;
             box-sizing: border-box; text-align: center;
         }
-        h1 { color: var(--accent-color); margin-bottom: 8px; }
+        h1 { color: var(--accent-color); margin-bottom: 5px; font-size: 22px; }
         .queue-card {
             background: #0d1117; border: 1px solid var(--accent-cyan); border-radius: 10px;
-            padding: 15px; margin: 20px 0; display: none;
+            padding: 12px; margin: 15px 0; display: none;
         }
-        .pulse-btn {
-            background: linear-gradient(135deg, #ff6f00, #ff8f00); color: white; border: none;
-            padding: 16px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px;
+        .chat-box {
+            background: #0d1117; border: 1px solid var(--border-color); border-radius: 8px;
+            height: 220px; overflow-y: auto; padding: 10px; text-align: left; margin-bottom: 10px;
         }
+        .msg { margin-bottom: 8px; font-size: 13px; word-break: break-all; }
+        .msg-user { color: var(--accent-cyan); }
+        .msg-admin { color: var(--accent-orange); }
+        .msg-img { max-width: 100%; border-radius: 6px; margin-top: 5px; border: 1px solid var(--border-color); }
+        .input-row { display: flex; gap: 6px; }
+        .input-row input[type="text"] { flex: 1; padding: 8px; background: #0d1117; border: 1px solid var(--border-color); color: #fff; border-radius: 6px; }
+        .btn { padding: 8px 14px; background: var(--accent-color); border: none; color: white; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .btn-cyan { background: var(--accent-cyan); color: #000; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -39,19 +47,27 @@
 <body>
 
     <div class="container">
-        <h1>Mandalina OS Santral</h1>
-        <p style="color:#8b949e;">Canlı İletişim & Destek Hattı</p>
+        <h1>Mandalina OS GLITCH Destek</h1>
+        <p style="color:#8b949e; font-size: 13px;">Canlı Mesajlaşma, Ekran Görüntüsü & Uzaktan Kontrol</p>
 
-        <div id="userInfoDisplay" style="color: var(--accent-cyan); font-weight: bold; margin-bottom: 15px;"></div>
+        <div id="userInfoDisplay" style="color: var(--accent-cyan); font-weight: bold; margin-bottom: 10px;"></div>
 
-        <button class="pulse-btn" onclick="destekTalebiOlustur()">📞 Maestro (Muhammed) ile Görüşme Sırası Al</button>
+        <button class="btn" style="width:100%; padding:12px; margin-bottom:10px;" onclick="destekTalebiOlustur()">📞 Maestro (Muhammed) ile Destek Başlat</button>
 
-        <!-- Canlı Sıra Durum Kartı -->
         <div class="queue-card" id="queueCard">
-            <h3 style="color: var(--accent-cyan); margin: 0 0 10px 0;">Sıra Bekleniyor...</h3>
-            <p id="queuePositionText" style="font-size: 18px; font-weight: bold; color: #fff;">Önünüzde: 0 Kişi Var</p>
-            <p id="adminActivityText" style="font-size: 13px; color: #8b949e;">Muhammed Şu An: Boşta (Çağrı Bekliyor)</p>
+            <p id="queuePositionText" style="font-size: 15px; font-weight: bold; color: #fff; margin:0;">Sırada Bekleniyor...</p>
+            <p id="adminActivityText" style="font-size: 12px; color: #8b949e; margin: 4px 0 0 0;">Muhammed: Boşta</p>
         </div>
+
+        <div class="chat-box" id="chatBox"></div>
+
+        <div class="input-row">
+            <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
+            <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="resimGonder(this)">
+            <button class="btn-cyan" onclick="document.getElementById('fileInput').click()">📷 Görsel</button>
+            <button class="btn" onclick="mesajGonder()">Gönder</button>
+        </div>
+        <button class="btn-cyan" style="width:100%; margin-top:8px;" onclick="uzaktanKontrolIstegi()">🖥️ Mandalina OS Uzaktan Kontrol İste</button>
     </div>
 
     <script>
@@ -66,23 +82,17 @@
                 window.location.href = "../";
                 return;
             }
-            document.getElementById('userInfoDisplay').innerText = `Hoş geldin, ${username}`;
+            document.getElementById('userInfoDisplay').innerText = `Kullanıcı: ${username}`;
 
-            // Canlı Yönetici Durumunu Dinle
             db.ref('status/activity').on('value', (snapshot) => {
-                const activity = snapshot.val() || "Boşta";
-                document.getElementById('adminActivityText').innerText = `Muhammed Şu An: ${activity}`;
+                document.getElementById('adminActivityText').innerText = `Muhammed Şu An: ${snapshot.val() || 'Boşta'}`;
             });
 
-            // Canlı Sıra Dinleyici
             db.ref('calls').on('value', (snapshot) => {
-                let position = 0;
-                let count = 0;
+                let position = 0, count = 0;
                 snapshot.forEach((child) => {
                     count++;
-                    if (child.val().user === username) {
-                        position = count;
-                    }
+                    if (child.val().user === username) position = count;
                 });
 
                 if (position > 0) {
@@ -92,14 +102,52 @@
                     document.getElementById('queueCard').style.display = 'none';
                 }
             });
+
+            db.ref(`chats/${username}`).on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                const chatBox = document.getElementById('chatBox');
+                const div = document.createElement('div');
+                div.className = `msg ${data.sender === username ? 'msg-user' : 'msg-admin'}`;
+                
+                if (data.type === 'text') {
+                    div.innerText = `${data.sender}: ${data.text}`;
+                } else if (data.type === 'image') {
+                    div.innerHTML = `<strong>${data.sender}:</strong><br><img src="${data.image}" class="msg-img">`;
+                }
+                chatBox.appendChild(div);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
         };
 
         function destekTalebiOlustur() {
-            const callRef = db.ref('calls').push();
-            callRef.set({
-                user: username,
-                timestamp: Date.now()
+            db.ref('calls').push().set({ user: username, timestamp: Date.now() });
+        }
+
+        function mesajGonder() {
+            const text = document.getElementById('chatInput').value.trim();
+            if (!text) return;
+            db.ref(`chats/${username}`).push().set({
+                sender: username, text: text, type: 'text', timestamp: Date.now()
             });
+            document.getElementById('chatInput').value = '';
+        }
+
+        function resimGonder(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    db.ref(`chats/${username}`).push().set({
+                        sender: username, image: e.target.result, type: 'image', timestamp: Date.now()
+                    });
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function uzaktanKontrolIstegi() {
+            db.ref(`remote_requests/${username}`).set({
+                user: username, status: 'requested', timestamp: Date.now()
+            }).then(() => alert("Uzaktan kontrol talebiniz Maestro'ya iletildi!"));
         }
     </script>
 </body>
