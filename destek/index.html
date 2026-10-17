@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandalina OS - Destek Merkezi</title>
+    <title>Mandalina OS - Destek Hattı</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -15,80 +15,22 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
+            background-color: var(--bg-color); color: var(--text-color);
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .container {
-            width: 100%; max-width: 480px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 24px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            width: 100%; max-width: 480px; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 12px; padding: 24px;
+            box-sizing: border-box; text-align: center;
         }
-        h1 { color: var(--accent-color); text-align: center; font-size: 24px; margin-bottom: 8px; }
-        p.subtitle { text-align: center; font-size: 14px; color: #8b949e; margin-bottom: 24px; }
-        .user-welcome {
-            display: none; background: #11161d; padding: 12px;
-            border-radius: 8px; border: 1px solid var(--border-color);
-            margin-bottom: 15px; align-items: center; justify-content: space-between;
+        h1 { color: var(--accent-color); margin-bottom: 8px; }
+        .queue-card {
+            background: #0d1117; border: 1px solid var(--accent-cyan); border-radius: 10px;
+            padding: 15px; margin: 20px 0; display: none;
         }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-color); }
-        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .menu-btn {
-            background-color: #21262d; border: 1px solid var(--border-color);
-            color: var(--text-color); padding: 16px; border-radius: 8px;
-            font-size: 16px; font-weight: 600; cursor: pointer; text-align: left;
-            transition: 0.2s; display: flex; justify-content: space-between; align-items: center;
-        }
-        .menu-btn:hover { background-color: #30363d; border-color: var(--accent-color); color: #fff; }
-        .login-box {
-            display: none; margin-top: 15px; background: #11161d;
-            padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);
-        }
-        .login-box input {
-            width: 100%; padding: 10px; margin-bottom: 10px;
-            background: #0d1117; border: 1px solid var(--border-color);
-            color: #fff; border-radius: 6px; box-sizing: border-box;
-        }
-        .login-box button {
-            width: 100%; padding: 10px; background: var(--accent-color);
-            border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer;
-        }
-        .status-box {
-            margin-top: 20px; background: #090d16; border: 1px solid var(--border-color);
-            padding: 12px; border-radius: 8px; font-size: 13px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .badge { background: #238636; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; }
-
-        /* CANLI GÖRÜŞME EKRANI MODAL */
-        .call-overlay {
-            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-            justify-content: center; align-items: center; z-index: 2000;
-        }
-        .call-card {
-            background: #161b22; border: 1px solid var(--accent-cyan);
-            border-radius: 16px; padding: 30px; text-align: center; width: 320px;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
-        }
-        .pulse-avatar {
-            width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent-cyan);
-            margin: 0 auto 15px auto; animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(0, 240, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
-        }
-        .btn-endcall {
-            background: #da3633; color: white; border: none; padding: 12px 24px;
-            border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        .pulse-btn {
+            background: linear-gradient(135deg, #ff6f00, #ff8f00); color: white; border: none;
+            padding: 16px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 10px;
         }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -97,55 +39,18 @@
 <body>
 
     <div class="container">
-        <h1>Mandalina OS Destek</h1>
-        <p class="subtitle">GLITCH Destek ve İletişim Hattı</p>
+        <h1>Mandalina OS Santral</h1>
+        <p style="color:#8b949e;">Canlı İletişim & Destek Hattı</p>
 
-        <div class="user-welcome" id="userWelcome">
-            <div class="user-info">
-                <img id="displayAvatar" src="" alt="Profil" class="user-avatar">
-                <div>
-                    <span style="font-size: 11px; color: #8b949e; display: block;">Giriş Yapıldı</span>
-                    <strong id="displayName" style="color:var(--accent-color);"></strong>
-                </div>
-            </div>
-            <button onclick="oturumuKapat()" style="background:none; border:none; color:#8b949e; cursor:pointer; font-size:12px;">Çıkış Yap</button>
-        </div>
+        <div id="userInfoDisplay" style="color: var(--accent-cyan); font-weight: bold; margin-bottom: 15px;"></div>
 
-        <div class="menu-grid" id="menuGrid">
-            <button class="menu-btn" onclick="secimYap('Teknik Destek & Kurulum')">
-                <span>🛠️ Mandalina OS Kurulum & Hata</span> ➔
-            </button>
-            <button class="menu-btn" onclick="secimYap('Mandalina OS GLITCH Sürümü')">
-                <span>🍊 GLITCH Yapılandırma & Özellikler</span> ➔
-            </button>
-            <button class="menu-btn" onclick="secimYap('Donanım Uyumluluğu')">
-                <span>💻 Donanım & Sürücü Uyumluluğu</span> ➔
-            </button>
-            <button class="menu-btn" onclick="secimYap('Genel Sohbet')">
-                <span>💬 Diğer / Genel Konular</span> ➔
-            </button>
-        </div>
+        <button class="pulse-btn" onclick="destekTalebiOlustur()">📞 Maestro (Muhammed) ile Görüşme Sırası Al</button>
 
-        <div class="login-box" id="loginBox">
-            <h4 style="margin-top:0; color:var(--accent-color);">Profil Oluştur</h4>
-            <input type="text" id="usernameInput" placeholder="Adınız veya Kullanıcı Adınız">
-            <input type="file" id="avatarFileInput" accept="image/*">
-            <button onclick="kayitOl()">Profili Kaydet ve Devam Et</button>
-        </div>
-
-        <div class="status-box">
-            <span>Muhammed: <strong id="muhammedStatus" style="color: #da3633;">Çevrimdışı</strong></span>
-            <span class="badge" id="siraBadge">Bekleyen: 0 Kişi</span>
-        </div>
-    </div>
-
-    <!-- CANLI GÖRÜŞME EKRANI (Aramaya Geçildiğinde Çıkar) -->
-    <div class="call-overlay" id="callOverlay">
-        <div class="call-card">
-            <img id="callAvatar" src="" class="pulse-avatar">
-            <h3 id="callStatusText" style="color: var(--accent-cyan); margin: 5px 0;">Bağlanıyor...</h3>
-            <p id="callUserText" style="color: #8b949e; font-size: 14px;">Maestro ile Görüşme</p>
-            <button class="btn-endcall" onclick="aramayiKapat()">Aramayı Sonlandır</button>
+        <!-- Canlı Sıra Durum Kartı -->
+        <div class="queue-card" id="queueCard">
+            <h3 style="color: var(--accent-cyan); margin: 0 0 10px 0;">Sıra Bekleniyor...</h3>
+            <p id="queuePositionText" style="font-size: 18px; font-weight: bold; color: #fff;">Önünüzde: 0 Kişi Var</p>
+            <p id="adminActivityText" style="font-size: 13px; color: #8b949e;">Muhammed Şu An: Boşta (Çağrı Bekliyor)</p>
         </div>
     </div>
 
@@ -153,31 +58,49 @@
         const firebaseConfig = { databaseURL: "https://mandalina-os-web-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let myCallKey = null;
+        let username = localStorage.getItem('mandalinos_user');
 
         window.onload = function() {
-            const kayitliKullanici = localStorage.getItem('mandalinos_user');
-            const kayitliAvatar = localStorage.getItem('mandalinos_avatar');
-            
-            if (kayitliKullanici) {
-                document.getElementById('displayName').innerText = kayitliKullanici;
-                document.getElementById('displayAvatar').src = kayitliAvatar || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + kayitliKullanici;
-                document.getElementById('userWelcome').style.display = 'flex';
-            } else {
-                document.getElementById('loginBox').style.display = 'block';
+            if (!username) {
+                alert("Önce ana sayfadan giriş yapmalısınız!");
+                window.location.href = "../";
+                return;
             }
+            document.getElementById('userInfoDisplay').innerText = `Hoş geldin, ${username}`;
 
-            db.ref('status/muhammed').on('value', (snapshot) => {
-                const status = snapshot.val();
-                const statusElem = document.getElementById('muhammedStatus');
-                if (status === 'online') {
-                    statusElem.innerText = "Aktif (Çevrimiçi)";
-                    statusElem.style.color = "#238636";
-                } else {
-                    statusElem.innerText = "Çevrimdışı";
-                    statusElem.style.color = "#da3633";
-                }
+            // Canlı Yönetici Durumunu Dinle
+            db.ref('status/activity').on('value', (snapshot) => {
+                const activity = snapshot.val() || "Boşta";
+                document.getElementById('adminActivityText').innerText = `Muhammed Şu An: ${activity}`;
             });
 
+            // Canlı Sıra Dinleyici
             db.ref('calls').on('value', (snapshot) => {
-                document.getElementById('siraBadge').innerText =
+                let position = 0;
+                let count = 0;
+                snapshot.forEach((child) => {
+                    count++;
+                    if (child.val().user === username) {
+                        position = count;
+                    }
+                });
+
+                if (position > 0) {
+                    document.getElementById('queueCard').style.display = 'block';
+                    document.getElementById('queuePositionText').innerText = `Sıranız: ${position}. (Önünüzde ${position - 1} kişi var)`;
+                } else {
+                    document.getElementById('queueCard').style.display = 'none';
+                }
+            });
+        };
+
+        function destekTalebiOlustur() {
+            const callRef = db.ref('calls').push();
+            callRef.set({
+                user: username,
+                timestamp: Date.now()
+            });
+        }
+    </script>
+</body>
+</html>
