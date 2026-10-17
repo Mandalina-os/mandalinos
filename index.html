@@ -3,127 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandalina OS - Kod Adı: GLITCH</title>
+    <title>Mandalina OS - Resmi Web Sitesi</title>
     <style>
         :root {
             --bg-color: #0a0d12;
             --card-bg: #121824;
+            --card-border: #212836;
             --accent-orange: #ff6f00;
-            --accent-glitch: #00f0ff;
-            --text-color: #e6edf3;
-            --border-color: #212836;
+            --accent-cyan: #00f0ff;
+            --text-main: #e6edf3;
+            --text-sub: #8b949e;
         }
+
+        * {
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
             padding: 0;
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 13, 18, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 15px 30px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--accent-orange);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a {
+            color: var(--text-sub);
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-orange);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 10px 30px rgba(0,240,255,0.05);
             text-align: center;
-            position: relative;
+            padding: 120px 20px 60px 20px;
+            background: radial-gradient(circle at center, rgba(255, 111, 0, 0.1) 0%, rgba(10, 13, 18, 1) 70%);
         }
-        .glitch-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--accent-orange);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(255,111,0,0.5);
-        }
-        .codename {
+
+        .glitch-badge {
             display: inline-block;
             background: rgba(0, 240, 255, 0.1);
-            color: var(--accent-glitch);
-            padding: 4px 12px;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            padding: 6px 16px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: bold;
-            border: 1px solid var(--accent-glitch);
-            margin-bottom: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
         }
-        .hero-desc {
-            color: #8b949e;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 30px;
+
+        h1.hero-title {
+            font-size: 48px;
+            margin: 0;
+            color: var(--accent-orange);
+            text-shadow: 0 0 20px rgba(255, 111, 0, 0.4);
+            font-weight: 800;
         }
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr;
+
+        p.hero-subtitle {
+            font-size: 18px;
+            color: var(--text-sub);
+            max-width: 600px;
+            margin: 20px 0 40px 0;
+        }
+
+        .hero-buttons {
+            display: flex;
             gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .main-btn {
-            background: #1a2233;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 16px 20px;
-            border-radius: 10px;
-            font-size: 16px;
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: bold;
+            text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-        .main-btn:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent-orange);
-            box-shadow: 0 5px 15px rgba(255, 111, 0, 0.2);
-            color: #fff;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #ff6f00, #ff8f00);
+            gap: 8px;
             border: none;
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #ff6f00, #ff8f00);
             color: white;
+            box-shadow: 0 4px 15px rgba(255, 111, 0, 0.3);
         }
-        .btn-primary:hover {
-            box-shadow: 0 5px 20px rgba(255, 111, 0, 0.4);
+
+        .btn-orange:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 111, 0, 0.5);
         }
-        .btn-support {
-            border-color: var(--accent-glitch);
-            color: var(--accent-glitch);
+
+        .btn-cyan {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
         }
-        .btn-support:hover {
-            background: var(--accent-glitch);
+
+        .btn-cyan:hover {
+            background: var(--accent-cyan);
             color: #000;
-            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Content Sections */
+        .section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: var(--accent-orange);
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--accent-orange);
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        /* Grid & Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 25px;
+            transition: transform 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-50px);
+            border-color: var(--accent-orange);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--card-border);
+            background: #000;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--accent-orange);
+            font-size: 20px;
+        }
+
+        .card p {
+            color: var(--text-sub);
+            font-size: 14px;
+        }
+
+        .badge-beta {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e65100;
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .badge-stable {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #2e7d32;
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-sub);
+            font-size: 13px;
+            background: #07090d;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="glitch-title">Mandalina OS</div>
-        <div class="codename">KOD ADI: GLITCH</div>
-        <p class="hero-desc">Hızlı, özelleştirilebilir ve hafif yeni nesil işletim sistemi deneyimi.</p>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">🍊 Mandalina OS</div>
+        <div class="nav-links">
+            <a href="#hakkinda">Hakkında</a>
+            <a href="#surumler">Sürümler</a>
+            <a href="destek/">Canlı Santral</a>
+        </div>
+    </nav>
 
-        <div class="btn-grid">
-            <a href="#" class="main-btn btn-primary" onclick="alert('Mandalina OS GLITCH ISO indirme bağlantısı hazırlanıyor...')">
-                <span>⚡ Mandalina OS'u İndir (ISO)</span>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="glitch-badge">KOD ADI: GLITCH</div>
+        <h1 class="hero-title">MANDALİNA OS</h1>
+        <p class="hero-subtitle">Visual Basic tabanlı güçlü mimariden gelecek nesil GLITCH çekirdeğine uzanan özel işletim sistemi projesi.</p>
+        
+        <div class="hero-buttons">
+            <a href="https://drive.google.com/file/d/10v1qK8se-7l9hU7crPRPsSUcyYLVkIyL/view?usp=sharing" target="_blank" class="btn btn-orange">
+                💾 Mandalina OS 3.0 İndir (.EXE)
             </a>
-            <a href="destek/" class="main-btn btn-support">
-                <span>📞 Canlı Destek & Santral Hattı</span>
+            <a href="destek/" class="btn btn-cyan">
+                📞 Canlı Destek & Santral Hattı
             </a>
         </div>
-    </div>
+    </section>
+
+    <!-- Hakkında Section -->
+    <section class="section" id="hakkinda">
+        <h2 class="section-title">Proje Hakkında</h2>
+        <div style="background: var(--card-bg); border: 1px solid var(--card-border); padding: 30px; border-radius: 12px; color: var(--text-sub);">
+            <p>Mandalina OS, tamamen bağımsız olarak geliştirilen, kullanıcı dostu arayüzler ve hafif sistem araçları sunmayı hedefleyen bir işletim sistemi projesidir.</p>
+            <p>Sistem, ilk sürümlerinde Visual Basic (VB) altyapısı kullanılarak doğrudan çalıştırılabilir <strong>.EXE</strong> formatında derlenmiş ve stabilize edilmiştir. Günümüzde ise daha gelişmiş, modüler ve yüksek performanslı <strong>GLITCH</strong> kod adlı yeni mimariye geçiş süreci devam etmektedir.</p>
+        </div>
+    </section>
+
+    <!-- Sürümler Section -->
+    <section class="section" id="surumler">
+        <h2 class="section-title">Mandalina OS Sürümleri</h2>
+        <div class="card-grid">
+            
+            <!-- Mandalina OS 3.0 Card -->
+            <div class="card">
+                <span class="badge-stable">STABLE (KARARLI)</span>
+                <img src="Mandalinaos 3.0-walper.png" alt="Mandalina OS 3.0 Wallpaper" class="card-img" onerror="this.src='https://via.placeholder.com/400x180/161b22/ff6f00?text=Mandalina+OS+3.0+Wallpaper'">
+                <h3>Mandalina OS 3.0</h3>
+                <p>Visual Basic tabanı ile derlenmiş ana stabil sürüm. Sistem kaynaklarını minimum seviyede kullanarak hızlı bir masaüstü deneyimi sağlar.</p>
+                <p><strong>Format:</strong> .EXE Derlenmiş Çalıştırılabilir Dosya</p>
+                <a href="https://drive.google.com/file/d/10v1qK8se-7l9hU7crPRPsSUcyYLVkIyL/view?usp=sharing" target="_blank" class="btn btn-orange" style="width: 100%; text-align: center; justify-content: center; margin-top: 15px;">
+                    Google Drive'dan İndir
+                </a>
+            </div>
+
+            <!-- Mandalina OS GLITCH Card -->
+            <div class="card">
+                <span class="badge-beta">YAKINDA (BETA)</span>
+                <img src="mandalinaos-glitch.png" alt="Mandalina OS GLITCH" class="card-img" onerror="this.src='https://via.placeholder.com/400x180/121824/00f0ff?text=Mandalina+OS+GLITCH'">
+                <h3>Kod Adı: GLITCH</h3>
+                <p>Mandalina OS'un yeni nesil sürümü! Yenilenmiş çekirdek yapısı, gelişmiş görsel efektler ve yüksek performans odaklı yeni modüller içerir.</p>
+                <p><strong>Durum:</strong> Yakında Beta Sürümü Yayınlanacak...</p>
+                <button class="btn btn-cyan" style="width: 100%; justify-content: center; margin-top: 15px; opacity: 0.7; cursor: not-allowed;">
+                    Geliştirme Aşamasında
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Mandalina OS Project &copy; 2026 - Tüm Hakları Saklıdır.</p>
+        <p style="font-size: 11px; opacity: 0.6;">Geliştirici & Santral Yöneticisi:  (Muhammed)</p>
+    </footer>
 
 </body>
 </html>
