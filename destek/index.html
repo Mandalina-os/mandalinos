@@ -9,6 +9,7 @@
             --bg-color: #0d1117;
             --card-bg: #161b22;
             --accent-color: #ff6f00;
+            --accent-cyan: #00f0ff;
             --text-color: #c9d1d9;
             --border-color: #30363d;
         }
@@ -64,6 +65,31 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         .badge { background: #238636; color: white; padding: 4px 8px; border-radius: 12px; font-size: 11px; }
+
+        /* CANLI GÖRÜŞME EKRANI MODAL */
+        .call-overlay {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            justify-content: center; align-items: center; z-index: 2000;
+        }
+        .call-card {
+            background: #161b22; border: 1px solid var(--accent-cyan);
+            border-radius: 16px; padding: 30px; text-align: center; width: 320px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+        }
+        .pulse-avatar {
+            width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--accent-cyan);
+            margin: 0 auto 15px auto; animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        .btn-endcall {
+            background: #da3633; color: white; border: none; padding: 12px 24px;
+            border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -71,7 +97,7 @@
 <body>
 
     <div class="container">
-        <h1>Mandalina OS Santral</h1>
+        <h1>Mandalina OS Destek</h1>
         <p class="subtitle">GLITCH Destek ve İletişim Hattı</p>
 
         <div class="user-welcome" id="userWelcome">
@@ -113,10 +139,21 @@
         </div>
     </div>
 
+    <!-- CANLI GÖRÜŞME EKRANI (Aramaya Geçildiğinde Çıkar) -->
+    <div class="call-overlay" id="callOverlay">
+        <div class="call-card">
+            <img id="callAvatar" src="" class="pulse-avatar">
+            <h3 id="callStatusText" style="color: var(--accent-cyan); margin: 5px 0;">Bağlanıyor...</h3>
+            <p id="callUserText" style="color: #8b949e; font-size: 14px;">Maestro ile Görüşme</p>
+            <button class="btn-endcall" onclick="aramayiKapat()">Aramayı Sonlandır</button>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = { databaseURL: "https://mandalina-os-web-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        let myCallKey = null;
 
         window.onload = function() {
             const kayitliKullanici = localStorage.getItem('mandalinos_user');
@@ -143,57 +180,4 @@
             });
 
             db.ref('calls').on('value', (snapshot) => {
-                document.getElementById('siraBadge').innerText = `Bekleyen: ${snapshot.numChildren()} Kişi`;
-            });
-        };
-
-        function kayitOl() {
-            const isim = document.getElementById('usernameInput').value.trim();
-            const fileInput = document.getElementById('avatarFileInput');
-
-            if (!isim) { alert("Lütfen adını yaz kanka!"); return; }
-
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    localStorage.setItem('mandalinos_user', isim);
-                    localStorage.setItem('mandalinos_avatar', e.target.result);
-                    location.reload();
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                localStorage.setItem('mandalinos_user', isim);
-                localStorage.setItem('mandalinos_avatar', 'https://api.dicebear.com/7.x/identicon/svg?seed=' + isim);
-                location.reload();
-            }
-        }
-
-        function oturumuKapat() {
-            localStorage.clear();
-            location.reload();
-        }
-
-        function secimYap(kategori) {
-            const kayitliKullanici = localStorage.getItem('mandalinos_user');
-            const kayitliAvatar = localStorage.getItem('mandalinos_avatar');
-
-            if (!kayitliKullanici) {
-                alert("Lütfen önce profil oluştur!");
-                document.getElementById('loginBox').style.display = 'block';
-                return;
-            }
-
-            const callRef = db.ref('calls').push();
-            callRef.set({
-                user: kayitliKullanici,
-                avatar: kayitliAvatar,
-                category: kategori,
-                timestamp: Date.now()
-            }).then(() => {
-                alert(`${kayitliKullanici}, "${kategori}" talebin Maestro'ya (Muhammed) iletildi!`);
-            });
-        }
-    </script>
-
-</body>
-</html>
+                document.getElementById('siraBadge').innerText =
