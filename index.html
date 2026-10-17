@@ -139,6 +139,10 @@
             font-size: 11px;
         }
     </style>
+
+    <!-- Firebase Kütüphaneleri -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -183,12 +187,19 @@
         </div>
 
         <div class="status-box">
-            <span>Muhammed: <strong id="muhammedStatus" style="color: #238636;">Aktif (Çevrimiçi)</strong></span>
+            <span>Muhammed: <strong id="muhammedStatus" style="color: #da3633;">Çevrimdışı</strong></span>
             <span class="badge" id="siraBadge">Bekleyen: 0 Kişi</span>
         </div>
     </div>
 
     <script>
+        // Firebase Konfigürasyonu
+        const firebaseConfig = {
+            databaseURL: "https://mandalina-os-web-default-rtdb.firebaseio.com/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let secilenKategori = "";
 
         window.onload = function() {
@@ -202,6 +213,25 @@
             } else {
                 document.getElementById('loginBox').style.display = 'block';
             }
+
+            // Canlı Muhammed Durumu Dinle
+            db.ref('status/muhammed').on('value', (snapshot) => {
+                const status = snapshot.val();
+                const statusElem = document.getElementById('muhammedStatus');
+                if (status === 'online') {
+                    statusElem.innerText = "Aktif (Çevrimiçi)";
+                    statusElem.style.color = "#238636";
+                } else {
+                    statusElem.innerText = "Çevrimdışı";
+                    statusElem.style.color = "#da3633";
+                }
+            });
+
+            // Bekleyen İletişim İsteği Sayısını Dinle
+            db.ref('calls').on('value', (snapshot) => {
+                const count = snapshot.numChildren();
+                document.getElementById('siraBadge').innerText = `Bekleyen: ${count} Kişi`;
+            });
         };
 
         function kayitOl() {
@@ -245,13 +275,26 @@
 
         function secimYap(kategori) {
             const kayitliKullanici = localStorage.getItem('mandalinos_user');
+            const kayitliAvatar = localStorage.getItem('mandalinos_avatar');
+
             if (!kayitliKullanici) {
                 alert("Lütfen önce profilini oluştur!");
                 document.getElementById('loginBox').style.display = 'block';
                 return;
             }
+
             secilenKategori = kategori;
-            alert(`${kayitliKullanici}, "${secilenKategori}" kategorisi için desteğe yönlendiriliyorsun.`);
+
+            // Firebase'e Arama Talebi At
+            const callRef = db.ref('calls').push();
+            callRef.set({
+                user: kayitliKullanici,
+                avatar: kayitliAvatar,
+                category: kategori,
+                timestamp: Date.now()
+            }).then(() => {
+                alert(`${kayitliKullanici}, "${secilenKategori}" talebin Maestro'ya (Muhammed) iletildi. Bekleniyor...`);
+            });
         }
     </script>
 
