@@ -108,13 +108,13 @@
 
         window.onload = function() {
             if (!username) {
-                alert("Önce ana sayfadan giriş yapmalısınız!");
+                alert("Önce ana sayfadan giriş yapmalısınız kanka!");
                 window.location.href = "../";
                 return;
             }
             document.getElementById('userInfoDisplay').innerText = `Kullanıcı: ${username}`;
 
-            // 15 Dakika Hareketsizlik veya Sayfadan Çıkışta Sıradan Düşme
+            // 15 Dakika Hareketsizlik veya Sekmeden Ayrılmada Sıradan Otomatik Düşme
             resetInactivityTimer();
             window.onmousemove = resetInactivityTimer;
             window.onkeypress = resetInactivityTimer;
@@ -137,7 +137,7 @@
                     count++;
                     if (child.val().user === username) {
                         position = count;
-                        myCallKey = child.key;
+                        myCallKey = child.key; // Kullanıcının sıradaki key'i
                     }
                 });
 
@@ -172,14 +172,17 @@
             });
         };
 
+        // SPAM KORUMALI VE TEK TIKLA SIRA YÖNETİMİ
         function sirayiYonet() {
             if (myCallKey) {
                 siradanCik();
             } else {
-                // Daha önce listede var mı kontrol et
+                // Sunucuda bu kullanıcı adıyla zaten bir sıra var mı kontrol et (Spam önlemi)
                 db.ref('calls').orderByChild('user').equalTo(username).once('value', (snapshot) => {
                     if (!snapshot.exists()) {
                         db.ref('calls').push().set({ user: username, timestamp: Date.now() });
+                    } else {
+                        alert("Zaten destek sırasındasın kanka!");
                     }
                 });
             }
@@ -189,6 +192,13 @@
             if (myCallKey) {
                 db.ref(`calls/${myCallKey}`).remove();
                 myCallKey = null;
+            } else {
+                // Güvenlik amaçlı kullanıcı adıyla eşleşen tüm kayıtları temizle
+                db.ref('calls').orderByChild('user').equalTo(username).once('value', (snapshot) => {
+                    snapshot.forEach((child) => {
+                        db.ref(`calls/${child.key}`).remove();
+                    });
+                });
             }
         }
 
@@ -196,7 +206,7 @@
             clearTimeout(inactivityTimer);
             inactivityTimer = setTimeout(() => {
                 siradanCik();
-            }, 15 * 60 * 1000); // 15 dakika
+            }, 15 * 60 * 1000); // 15 dakika hareketsizlik
         }
 
         function mesajGonder() {
