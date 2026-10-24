@@ -43,18 +43,12 @@
         .btn-cyan { background: var(--accent-cyan); color: #000; border: none; font-weight: bold; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
         .btn-danger { background: #da3633; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; }
         
-        /* HAZIR TAMİR / ONARIM BUTONLARI */
-        .repair-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
-        }
+        .repair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
         .btn-repair {
             background: #21262d; border: 1px solid var(--accent-cyan); color: var(--accent-cyan);
-            padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;
-            transition: 0.2s;
+            padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
         }
-        .btn-repair:hover {
-            background: var(--accent-cyan); color: #000;
-        }
+        .btn-repair:hover { background: var(--accent-cyan); color: #000; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -67,11 +61,12 @@
 
         <div id="userInfoDisplay" style="color: var(--accent-cyan); font-weight: bold; margin-bottom: 10px;"></div>
 
-        <button id="requestBtn" class="btn" style="width:100%; padding:12px; margin-bottom:10px;" onclick="destekTalebiOlustur()">📞 Maestro (Muhammed) ile Görüşme Sırası Al</button>
+        <button id="requestBtn" class="btn" style="width:100%; padding:12px; margin-bottom:10px;" onclick="sirayiYonet()">📞 Canlı Destek Sırası Al</button>
 
         <div class="queue-card" id="queueCard">
             <p id="queuePositionText" style="font-size: 16px; font-weight: bold; color: #fff; margin:0;">Sıra Bekleniyor...</p>
-            <p id="adminActivityText" style="font-size: 12px; color: #8b949e; margin: 6px 0 0 0;">Muhammed Şu An: Boşta</p>
+            <p id="adminActivityText" style="font-size: 12px; color: #8b949e; margin: 6px 0 0 0;">Destek Durumu: Aktif</p>
+            <button class="btn-danger" style="margin-top: 10px; width: 100%; padding: 6px;" onclick="siradanCik()">❌ Sıradan Çık</button>
         </div>
 
         <div class="chat-container" id="chatContainer">
@@ -91,7 +86,6 @@
 
             <button class="btn-cyan" style="width:100%; padding: 10px; margin-top: 5px;" onclick="uzaktanKontrolIstegi()">🖥️ Mandalina OS Uzaktan Kontrol İste</button>
 
-            <!-- TEK TIKLA SİSTEM ONARIM PANELİ -->
             <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 10px; text-align: left;">
                 <span style="font-size: 12px; color: var(--accent-orange); font-weight: bold;">🛠️ Hızlı Sistem Onarım Araçları:</span>
                 <div class="repair-grid">
@@ -109,6 +103,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let username = localStorage.getItem('mandalinos_user');
+        let myCallKey = null;
+        let inactivityTimer;
 
         window.onload = function() {
             if (!username) {
@@ -118,9 +114,11 @@
             }
             document.getElementById('userInfoDisplay').innerText = `Kullanıcı: ${username}`;
 
-            db.ref('status/activity').on('value', (snapshot) => {
-                document.getElementById('adminActivityText').innerText = `Muhammed Şu An: ${snapshot.val() || 'Boşta'}`;
-            });
+            // 15 Dakika Hareketsizlik veya Sayfadan Çıkışta Sıradan Düşme
+            resetInactivityTimer();
+            window.onmousemove = resetInactivityTimer;
+            window.onkeypress = resetInactivityTimer;
+            window.onbeforeunload = function() { siradanCik(); };
 
             db.ref(`active_sessions/${username}`).on('value', (snapshot) => {
                 if (snapshot.exists() && snapshot.val().status === 'accepted') {
@@ -134,16 +132,23 @@
 
             db.ref('calls').on('value', (snapshot) => {
                 let position = 0, count = 0;
+                myCallKey = null;
                 snapshot.forEach((child) => {
                     count++;
-                    if (child.val().user === username) position = count;
+                    if (child.val().user === username) {
+                        position = count;
+                        myCallKey = child.key;
+                    }
                 });
 
+                const reqBtn = document.getElementById('requestBtn');
                 if (position > 0 && document.getElementById('chatContainer').style.display === 'none') {
                     document.getElementById('queueCard').style.display = 'block';
                     document.getElementById('queuePositionText').innerText = `Sıranız: ${position}. (Önünüzde ${position - 1} kişi var)`;
+                    reqBtn.innerText = "⚠️ Sıradasınız (İptal Et)";
                 } else if (position === 0 && document.getElementById('chatContainer').style.display === 'none') {
                     document.getElementById('queueCard').style.display = 'none';
+                    reqBtn.innerText = "📞 Canlı Destek Sırası Al";
                 }
             });
 
@@ -167,8 +172,31 @@
             });
         };
 
-        function destekTalebiOlustur() {
-            db.ref('calls').push().set({ user: username, timestamp: Date.now() });
+        function sirayiYonet() {
+            if (myCallKey) {
+                siradanCik();
+            } else {
+                // Daha önce listede var mı kontrol et
+                db.ref('calls').orderByChild('user').equalTo(username).once('value', (snapshot) => {
+                    if (!snapshot.exists()) {
+                        db.ref('calls').push().set({ user: username, timestamp: Date.now() });
+                    }
+                });
+            }
+        }
+
+        function siradanCik() {
+            if (myCallKey) {
+                db.ref(`calls/${myCallKey}`).remove();
+                myCallKey = null;
+            }
+        }
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(() => {
+                siradanCik();
+            }, 15 * 60 * 1000); // 15 dakika
         }
 
         function mesajGonder() {
@@ -201,16 +229,15 @@
         function uzaktanKontrolIstegi() {
             db.ref(`remote_requests/${username}`).set({
                 user: username, status: 'requested', timestamp: Date.now()
-            }).then(() => alert("Uzaktan kontrol talebiniz Maestro'ya iletildi!"));
+            }).then(() => alert("Uzaktan kontrol talebiniz iletildi!"));
         }
 
-        // MAESTRO İÇİN TEK TIKLA ONARIM KOMUTU GÖNDERİCİ
         function hizliKomutYolla(command, bilgi) {
             db.ref(`remote_commands/${username}`).set({
                 type: 'shell',
                 command: command,
                 timestamp: Date.now()
-            }).then(() => alert(`⚡ Komut gönderildi: [${bilgi}]\nKomut: ${command}`));
+            }).then(() => alert(`⚡ Komut gönderildi: [${bilgi}]`));
         }
     </script>
 </body>
