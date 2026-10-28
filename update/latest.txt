@@ -1,5 +1,5 @@
-VERSION=4
-NAME=1.0.2
-FILE=update-4.tar.gz
-SHA256=c9b1f14562fb4d388bf3d6787bb0aef9816e93a0d8e8b75114fe2da880aff693
-NOTES=Yeni pencereli güncelleme ekranı|İlerleme çubuğu ve bildirim düğmesi eklendi
+VERSION=5
+NAME=1.0.3
+FILE=update-5.tar.gz
+SHA256=ea7a6856b01c23b29994bb5979237bc0df6e07057070c1ab06d2da13b55b8ade
+NOTES=Mandalina Merkezi (hoş geldin ve tek yerden araçlar)|Mandalina Mağazası: Wine, VLC, Discord, Steam ve daha fazlası|Windows programı (.exe) çalıştırıcı|Glitch açılış sesi|Önceki tüm güncellemeleri de içerir
