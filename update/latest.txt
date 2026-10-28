@@ -1,5 +1,5 @@
-VERSION=3
-NAME=1.0.1
-FILE=update-3.tar.gz
-SHA256=1157c478ec49f38144789926adf91d68b07a4a46eb0a3251055395a02c769330
-NOTES=Test güncellemesi|Yeni bir deneme dosyası eklendi
+VERSION=4
+NAME=1.0.2
+FILE=update-4.tar.gz
+SHA256=c9b1f14562fb4d388bf3d6787bb0aef9816e93a0d8e8b75114fe2da880aff693
+NOTES=Yeni pencereli güncelleme ekranı|İlerleme çubuğu ve bildirim düğmesi eklendi
