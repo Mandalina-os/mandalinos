@@ -1,0 +1,5 @@
+VERSION=3
+NAME=1.0.1
+FILE=update-3.tar.gz
+SHA256=1157c478ec49f38144789926adf91d68b07a4a46eb0a3251055395a02c769330
+NOTES=Test güncellemesi|Yeni bir deneme dosyası eklendi
