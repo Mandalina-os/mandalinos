@@ -1,5 +1,5 @@
-VERSION=5
-NAME=1.0.3
-FILE=update-5.tar.gz
-SHA256=ea7a6856b01c23b29994bb5979237bc0df6e07057070c1ab06d2da13b55b8ade
-NOTES=Mandalina Merkezi (hoş geldin ve tek yerden araçlar)|Mandalina Mağazası: Wine, VLC, Discord, Steam ve daha fazlası|Windows programı (.exe) çalıştırıcı|Glitch açılış sesi|Önceki tüm güncellemeleri de içerir
+VERSION=6
+NAME=1.0.4
+FILE=update-6.tar.gz
+SHA256=d5694deffe89f2136df40d3136e9aa3f3eec0f8c914131ffa17d07a20295d639
+NOTES=Test güncellemesi: güncelleme akışı denemesi
