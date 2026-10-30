@@ -1,5 +1,5 @@
-VERSION=8
-NAME=1.0.6
-FILE=update-8.tar.gz
-SHA256=64791abe8517a234306bd006fc4f6cd6a7854b45192fb78105755f1106924cc2
-NOTES=Güncelleme ve Mağaza: şifre doğrulama hatası düzeltildi|Önceki tüm güncellemeleri de içerir
+VERSION=9
+NAME=Optimasyon-5.1
+FILE=update-9.tar.gz
+SHA256=f136a9f2a8ee3d6b8f339d4570259a68005559f5a048c6e38549494510e7aa89
+NOTES=Mandalina OS Optimasyon Güncellemesi 5.1|Tema ve duvar kağıdı değiştirici: karanlık / aydınlık tema ve 4 yeni duvar kağıdı|Mandalina Temizlik: önbellek, çöp kutusu ve eski günlükleri temizler, boşalan alanı gösterir|Sistem Bilgisi penceresi (işlemci, RAM, disk, sürüm)|Hızlı Ayarlar: ses, parlaklık, Wi-Fi ve Bluetooth|Mağaza: arama çubuğu ve 50'den fazla uygulama (tarayıcı, oyun, geliştirme, ofis, medya…)|Önceki tüm güncellemeleri de içerir
