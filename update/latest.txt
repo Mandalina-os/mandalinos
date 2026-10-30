@@ -1,5 +1,5 @@
-VERSION=6
-NAME=1.0.4
-FILE=update-6.tar.gz
-SHA256=d5694deffe89f2136df40d3136e9aa3f3eec0f8c914131ffa17d07a20295d639
-NOTES=Test güncellemesi: güncelleme akışı denemesi
+VERSION=8
+NAME=1.0.6
+FILE=update-8.tar.gz
+SHA256=64791abe8517a234306bd006fc4f6cd6a7854b45192fb78105755f1106924cc2
+NOTES=Güncelleme ve Mağaza: şifre doğrulama hatası düzeltildi|Önceki tüm güncellemeleri de içerir
