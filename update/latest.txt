@@ -1,5 +1,5 @@
-VERSION=10
-NAME=Egitim-5.2
-FILE=update-10.tar.gz
-SHA256=26ce1f81855990b2ac57d296a58151d2a249696b7e19c6cc47a00d700d8209a7
-NOTES=Eğitim bölümü: EBA, e-Okul ve MEB kısayolları, eğitim uygulamaları|Akıllı Tahta ve Dokunmatik modu: büyük simgeler ve imleç, ekran klavyesi|Ekran Kalemi: Pardus Kalem ve Gromit-MPX (Mağaza'dan kurulur)|Mandalina Merkezi, Hızlı Ayarlar ve Eğitim masaüstüne sabitlendi|Ayarlar menüsü: tüm Mandalina araçları tek düzende|Mağazada Eğitim kategorisi: GeoGebra, Stellarium, GCompris, Scratch ve daha fazlası|Önceki tüm güncellemeleri de içerir
+VERSION=11
+NAME=Telefon-5.3
+FILE=update-11.tar.gz
+SHA256=62316729696ff96d756fd23d52deb964c666503176320b33761e95fbbe458772
+NOTES=Telefon Bağlantısı paneli (KDE Connect): telefonu eşleştir, dosya gönder, telefonu çaldır|Telefon bildirimlerini, ortak panoyu ve medya kumandasını kullanma|Mağazada Telefon kategorisi: KDE Connect tek tıkla kurulur|Mandalina Merkezi ve Ayarlar menüsüne Telefon eklendi|Önceki tüm güncellemeleri de içerir
